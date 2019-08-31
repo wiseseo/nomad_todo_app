@@ -6,21 +6,57 @@ import {
   StatusBar, 
   TextInput,
   Dimensions,
-  Platform
+  Platform,
+  ScrollView
 } from 'react-native';
+import { AppLoading } from "expo";
+import ToDo from './ToDo';
 
-const {height, width} = Dimensions.get("window");
+const { height, width } = Dimensions.get("window");
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content"/>
-      <Text style={styles.title}>My ToDo List</Text>
-      <View style={styles.card}>
-        <TextInput style={styles.input} placeholder={"New To Do"}/>
+export default class App extends React.Component {
+  state = {
+    newToDo: "",
+    loadedToDos: false
+  };
+  componentDidMount = () => {
+    this._loadToDos();
+  };
+  render() {
+    const {newToDo,loadedToDos} = this.state;
+    if (!loadedToDos) {
+      return <AppLoading />;
+    }
+    return (
+      <View style={styles.container}>
+        <StatusBar barStyle="light-content"/>
+        <Text style={styles.title}>My ToDo List</Text>
+        <View style={styles.card}>
+          <TextInput 
+          style={styles.input} 
+          placeholder={"New To Do"} 
+          value={newToDo}
+          onChangeText={this._controlNewToDo}
+          placeholderTextColor={"#999"}
+          returnKeyType={"done"}
+          autoCorrect={false}/>
+          <ScrollView contentContainerStyle={styles.toDos}>
+            <ToDo text={"you can do it"}/>
+          </ScrollView>
+        </View>
       </View>
-    </View>
-  );
+    );
+  }
+  _controlNewToDo = text => {
+    this.setState({
+      newToDo: text
+    });
+  };
+  _loadToDos = () => {
+    this.setState({
+      loadedToDos: true
+    });
+  };
 }
 
 const styles = StyleSheet.create({
@@ -56,6 +92,15 @@ const styles = StyleSheet.create({
         elevation: 3
       }
     })
+  },
+  input: {
+    padding: 20,
+    borderBottomColor: "#bbb",
+    borderBottomWidth: 1,
+    fontSize: 25
+  },
+  toDos: {
+    alignItems: "center"
   }
 
 });
